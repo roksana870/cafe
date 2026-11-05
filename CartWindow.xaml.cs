@@ -1,37 +1,32 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace mur
 {
     public partial class CartWindow : Window
     {
         private ObservableCollection<CartItem> cart;
-        private int currentUserId;
+        private int userId;
 
-        public CartWindow()
+        public CartWindow(ObservableCollection<CartItem> userCart, int currentUserId)
         {
             InitializeComponent();
 
-            cart = new ObservableCollection<CartItem>();
-            currentUserId = 0;
+            cart = userCart;
+            userId = currentUserId;
 
             CartDataGrid.ItemsSource = cart;
             UpdateTotal();
         }
 
-        public CartWindow(
-            ObservableCollection<CartItem> userCart,
-            int userId)
+        private void UpdateTotal()
         {
-            InitializeComponent();
-
-            cart = userCart ?? new ObservableCollection<CartItem>();
-            currentUserId = userId;
-
-            CartDataGrid.ItemsSource = cart;
-            UpdateTotal();
+            decimal total = cart.Sum(x => x.Price * x.Quantity);
+            TotalTextBlock.Text = total.ToString("F2");
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -40,12 +35,7 @@ namespace mur
 
             if (selectedItem == null)
             {
-                MessageBox.Show(
-                    "Сначала выберите товар.",
-                    "Корзина",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
+                MessageBox.Show("Выберите товар для удаления.");
                 return;
             }
 
@@ -55,60 +45,109 @@ namespace mur
 
         private void CheckoutButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentUserId == 0)
+            if (userId == 0)
             {
-                MessageBox.Show(
-                    "Для оформления заказа необходимо войти в систему.",
-                    "Авторизация",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
+                MessageBox.Show("Для оформления заказа необходимо войти в систему.");
                 return;
             }
 
             if (cart.Count == 0)
             {
-                MessageBox.Show(
-                    "Корзина пуста.",
-                    "Оформление заказа",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
+                MessageBox.Show("Корзина пуста.");
                 return;
             }
 
-            MessageBox.Show(
-                "Товары выбраны. Следующим шагом подключим сохранение заказа в базе данных.",
-                "Оформление заказа",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-        }
+            decimal total = cart.Sum(x => x.Price * x.Quantity);
 
-        private void UpdateTotal()
-        {
-            decimal total = cart.Sum(item => item.Total);
-            TotalTextBlock.Text = $"Итого: {total:N2} ₽";
+            using (SqlConnection connection = Database.GetConnection())
+            {
+                connection.Open();
+
+                using (SqlTransaction transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        int orderId;
+
+                        string orderQuery = @"
+INSERT INTO dbo.Orders (UserId, OrderDate, StatusId)
+OUTPUT INSERTED.Id
+VALUES (@UserId, GETDATE(), 1);";
+
+                        using (SqlCommand command = new SqlCommand(orderQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@UserId", userId);
+                            orderId = Convert.ToInt32(command.ExecuteScalar());
+                        }
+
+                        foreach (CartItem item in cart)
+                        {
+                            string stockQuery = @"
+UPDATE dbo.Products
+SET Stock = Stock - @Quantity
+WHERE Id = @ProductId
+AND Stock >= @Quantity
+AND Available = 1;";
+
+                            using (SqlCommand command = new SqlCommand(stockQuery, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@Quantity", item.Quantity);
+                                command.Parameters.AddWithValue("@ProductId", item.ProductId);
+
+                                int changedRows = command.ExecuteNonQuery();
+
+                                if (changedRows == 0)
+                                {
+                                    throw new Exception("Недостаточно товара на складе: " + item.Name);
+                                }
+                            }
+
+                            string itemQuery = @"
+INSERT INTO dbo.OrderItems
+(OrderId, ProductId, Quantity, Price)
+VALUES
+(@OrderId, @ProductId, @Quantity, @Price);";
+
+                            using (SqlCommand command = new SqlCommand(itemQuery, connection, transaction))
+                            {
+                                command.Parameters.AddWithValue("@OrderId", orderId);
+                                command.Parameters.AddWithValue("@ProductId", item.ProductId);
+                                command.Parameters.AddWithValue("@Quantity", item.Quantity);
+                                command.Parameters.AddWithValue("@Price", item.Price);
+
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                        transaction.Commit();
+
+                        MessageBox.Show(
+                            "Заказ №" + orderId + " успешно оформлен!\nСумма: " + total.ToString("F2"),
+                            "Заказ оформлен");
+
+                        cart.Clear();
+                        UpdateTotal();
+                    }
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            transaction.Rollback();
+                        }
+                        catch
+                        {
+                        }
+
+                        MessageBox.Show(
+                            "Не удалось оформить заказ:\n" + ex.Message,
+                            "Ошибка");
+                    }
+                }
+            }
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
-        }
-    }
-
-    public class CartItem
-    {
-        public int ProductId { get; set; }
-
-        public string Name { get; set; } = "";
-
-        public decimal Price { get; set; }
-
-        public int Quantity { get; set; }
-
-        public decimal Total
-        {
-            get { return Price * Quantity; }
         }
     }
 }

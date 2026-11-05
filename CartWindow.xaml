@@ -1,22 +1,22 @@
 ﻿<Window x:Class="mur.CartWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Корзина — Кафе 34"
-        Height="600"
-        Width="850"
-        MinHeight="450"
-        MinWidth="650"
+        Title="Корзина"
+        Height="500"
+        Width="750"
         WindowStartupLocation="CenterOwner"
         Background="#F5EBDD">
 
     <Grid Margin="20">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Корзина"
+        <TextBlock Text="Ваша корзина"
                    FontSize="28"
                    FontWeight="Bold"
                    Foreground="#654321"
@@ -27,74 +27,73 @@
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   CanUserAddRows="False"
+                  SelectionMode="Single"
                   Background="#FFFDF9"
-                  BorderBrush="#D8C3AA"
+                  Foreground="#654321"
                   RowBackground="#FFFDF9"
-                  AlternatingRowBackground="#F0E2D1"
-                  FontSize="15">
+                  AlternatingRowBackground="#F0E2D1">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Товар"
+
+                <DataGridTextColumn Header="Название"
                                     Binding="{Binding Name}"
-                                    Width="2*"/>
+                                    Width="*"/>
 
                 <DataGridTextColumn Header="Цена"
-                                    Binding="{Binding Price, StringFormat={}{0:N2} ₽}"
-                                    Width="*"/>
+                                    Binding="{Binding Price}"
+                                    Width="100"/>
 
                 <DataGridTextColumn Header="Количество"
                                     Binding="{Binding Quantity}"
-                                    Width="*"/>
+                                    Width="110"/>
 
                 <DataGridTextColumn Header="Сумма"
-                                    Binding="{Binding Total, StringFormat={}{0:N2} ₽}"
-                                    Width="*"/>
+                                    Binding="{Binding Total}"
+                                    Width="120"/>
+
             </DataGrid.Columns>
         </DataGrid>
 
-        <Grid Grid.Row="2" Margin="0,15,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <TextBlock x:Name="TotalTextBlock"
+                   Grid.Row="2"
+                   FontSize="23"
+                   FontWeight="Bold"
+                   Foreground="#654321"
+                   HorizontalAlignment="Right"
+                   Margin="0,15"/>
 
-            <TextBlock x:Name="TotalTextBlock"
-                       Text="Итого: 0 ₽"
-                       FontSize="20"
-                       FontWeight="Bold"
-                       Foreground="#654321"
-                       VerticalAlignment="Center"
-                       Margin="0,0,0,12"/>
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
 
-            <WrapPanel Grid.Row="1"
-                       HorizontalAlignment="Right">
+            <Button Content="Удалить товар"
+                    Width="130"
+                    Height="40"
+                    Margin="5"
+                    Background="#8B5E3C"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Click="RemoveButton_Click"/>
 
-                <Button Content="Удалить товар"
-                        Width="130"
-                        Height="40"
-                        Margin="0,0,10,0"
-                        Background="#B58A68"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Click="RemoveButton_Click"/>
+            <Button Content="Оформить заказ"
+                    Width="150"
+                    Height="40"
+                    Margin="5"
+                    Background="#6B351F"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Click="CheckoutButton_Click"/>
 
-                <Button Content="Оформить заказ"
-                        Width="150"
-                        Height="40"
-                        Margin="0,0,10,0"
-                        Background="#654321"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Click="CheckoutButton_Click"/>
+            <Button Content="Закрыть"
+                    Width="100"
+                    Height="40"
+                    Margin="5"
+                    Background="#D6BBA8"
+                    Foreground="#654321"
+                    BorderThickness="0"
+                    Click="CloseButton_Click"/>
 
-                <Button Content="Закрыть"
-                        Width="100"
-                        Height="40"
-                        Background="#8B5E3C"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Click="CloseButton_Click"/>
-            </WrapPanel>
-        </Grid>
+        </StackPanel>
+
     </Grid>
 </Window>

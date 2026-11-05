@@ -7,7 +7,7 @@ namespace mur
     public static class Database
     {
         private static readonly string connectionString =
-            @"Server=DESKTOP-QUVQJTJ;Database=cafe;Trusted_Connection=True;TrustServerCertificate=True;";
+            @"Server=DESKTOP-GKGI91L;Database=cafe;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static SqlConnection GetConnection()
         {
