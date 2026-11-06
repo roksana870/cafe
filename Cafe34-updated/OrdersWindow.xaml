@@ -1,0 +1,124 @@
+﻿<Window x:Class="mur.OrdersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Заказы"
+        Height="600"
+        Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5EBDD">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Управление заказами"
+                   FontSize="25"
+                   FontWeight="Bold"
+                   Foreground="#654321"
+                   Margin="0,0,0,12"/>
+
+        <DataGrid x:Name="OrdersDataGrid"
+                  Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  SelectionChanged="OrdersDataGrid_SelectionChanged"
+                  CanUserAddRows="False">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="№"
+                                    Binding="{Binding OrderId}"
+                                    Width="55"/>
+
+                <DataGridTextColumn Header="Клиент"
+                                    Binding="{Binding ClientName}"
+                                    Width="*"/>
+
+                <DataGridTextColumn Header="Дата"
+                                    Binding="{Binding OrderDate, StringFormat={}{0:dd.MM.yyyy HH:mm}}"
+                                    Width="150"/>
+
+                <DataGridTextColumn Header="Статус"
+                                    Binding="{Binding Status}"
+                                    Width="120"/>
+
+                <DataGridTextColumn Header="Сумма"
+                                    Binding="{Binding TotalAmount, StringFormat={}{0:F2}}"
+                                    Width="100"/>
+
+                <DataGridTextColumn Header="StatusId"
+                                    Binding="{Binding StatusId}"
+                                    Visibility="Hidden"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock Grid.Row="2"
+                   Text="Товары в заказе:"
+                   FontSize="18"
+                   FontWeight="Bold"
+                   Foreground="#654321"
+                   Margin="0,12,0,5"/>
+
+        <DataGrid x:Name="OrderItemsDataGrid"
+                  Grid.Row="3"
+                  AutoGenerateColumns="True"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"/>
+
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,12,0,0">
+
+            <Button Content="Готовится"
+                    Width="120"
+                    Height="35"
+                    Margin="5"
+                    Background="#D8C3AA"
+                    Click="PreparingButton_Click"/>
+
+            <Button Content="Готов"
+                    Width="100"
+                    Height="35"
+                    Margin="5"
+                    Background="#C6D8B5"
+                    Click="ReadyButton_Click"/>
+
+            <Button Content="Выдан"
+                    Width="100"
+                    Height="35"
+                    Margin="5"
+                    Background="#A8C9A0"
+                    Click="IssuedButton_Click"/>
+
+            <Button Content="Удалить"
+                    Width="100"
+                    Height="35"
+                    Margin="5"
+                    Background="#D99A8F"
+                    Click="DeleteButton_Click"/>
+
+            <Button Content="Обновить"
+                    Width="100"
+                    Height="35"
+                    Margin="5"
+                    Background="#D8C3AA"
+                    Click="RefreshButton_Click"/>
+
+            <Button Content="Закрыть"
+                    Width="100"
+                    Height="35"
+
+
+Margin="5"
+                    Background="#8B5E3C"
+                    Foreground="White"
+                    Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

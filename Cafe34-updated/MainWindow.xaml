@@ -1,0 +1,69 @@
+﻿<Window x:Class="mur.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Кафе 34 — Авторизация"
+        Height="550"
+        Width="420"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F5EBDD">
+
+    <Grid Margin="25">
+        <StackPanel VerticalAlignment="Center">
+
+            <Image Source="/logo.png"
+                   Height="100"
+                   Width="100"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,15"/>
+
+            <TextBlock Text="Кафе 34"
+                       FontSize="30"
+                       FontWeight="Bold"
+                       Foreground="#654321"
+                       HorizontalAlignment="Center"/>
+
+            <TextBlock Text="Авторизация"
+                       FontSize="18"
+                       Foreground="#654321"
+                       HorizontalAlignment="Center"
+                       Margin="0,5,0,25"/>
+
+            <TextBlock Text="Логин"
+                       Foreground="#654321"/>
+
+            <TextBox x:Name="LoginTextBox"
+                     Height="35"
+                     FontSize="16"
+                     Padding="8"
+                     Margin="0,5,0,15"/>
+
+            <TextBlock Text="Пароль"
+                       Foreground="#654321"/>
+
+            <PasswordBox x:Name="PasswordBox"
+                         Height="35"
+                         FontSize="16"
+                         Padding="8"
+                         Margin="0,5,0,20"/>
+
+            <Button Content="Войти"
+                    Height="40"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Background="#8B5E3C"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Click="LoginButton_Click"/>
+
+            <TextBlock x:Name="ErrorTextBlock"
+                       Foreground="Red"
+                       FontSize="13"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Margin="0,15,0,0"/>
+
+        </StackPanel>
+    </Grid>
+</Window>
